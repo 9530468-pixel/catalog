@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каталог курсов H2O</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap&subset=cyrillic">
+<style>
+  /* Layout: три экрана на одной странице (направления, курсы направления, курс). Белый фон, тонкая линия
+     с тёмным акцентом, бледно-голубой квадрат за заголовками, капсулы как в палитре бренда. Только светлая тема. */
+  :root {
+    --sky: #a3dbe2;
+    --aqua: #60c7d3;
+    --teal: #1cb4a4;
+    --deep: #0f687e;
+    --graphite: #4f5252;
+    --mist: #dddddd;
+    --paper: #ffffff;
+    --wash: #eef8fa;
+    --ink: #2e3131;
+    --font-display: "Montserrat", "Proxima Nova", "Segoe UI", Arial, sans-serif;
+    --font-body: "Montserrat", "Proxima Nova", "Segoe UI", Arial, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--graphite);
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 0.667rem;
+    line-height: 1.65;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 4rem;
+  }
+  .wrap { max-width: 64rem; margin: 0 auto; }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible { outline: 3px solid var(--aqua); outline-offset: 3px; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; color: var(--graphite); text-wrap: balance; margin: 0; }
+  h1:focus { outline: none; }
+
+  /* Шапка */
+  .top { display: flex; align-items: center; padding-top: 1.75rem; }
+  .top a { display: block; border-radius: 4px; }
+  .logo { display: block; height: 3.75rem; width: auto; }
+  .rule { position: relative; height: 1px; background: var(--graphite); margin-top: 1.25rem; }
+  .rule::after { content: ""; position: absolute; right: 0; top: -1.5px; width: 6.5rem; height: 4px; background: var(--graphite); }
+
+  /* Хлебные крошки */
+  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.6rem; padding-top: 2rem; font-size: 0.583rem; font-weight: 500; color: var(--deep); }
+  .crumbs a { border-bottom: 1px solid var(--sky); }
+  .crumbs a:hover { border-bottom-color: var(--deep); }
+  .crumbs .sep { color: var(--graphite); opacity: 0.5; }
+  .crumbs .here { color: var(--graphite); font-weight: 400; }
+
+  /* Заголовки экранов */
+  .head { position: relative; padding: 3.5rem 0 0; }
+  .corner { position: relative; padding: 2.4rem 0 0 2.2rem; }
+  .corner::before { content: ""; position: absolute; left: 0; top: 0; width: 4.2rem; height: 4.2rem; background: var(--sky); }
+  h1 { position: relative; font-size: clamp(1.333rem, 4vw, 2.333rem); line-height: 1.1; letter-spacing: -0.01em; }
+  .lead { max-width: 38rem; margin: 1.5rem 0 0 2.2rem; font-size: 0.75rem; }
+  .eyebrow { position: relative; display: block; margin-bottom: 0.6rem; font-size: 0.5rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--deep); }
+
+  /* Главная: два направления */
+  .cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
+  .cat-card { position: relative; display: flex; flex-direction: column; padding: 3.25rem 1.5rem 1.5rem; background: var(--wash); border: 1px solid var(--sky); transition: border-color 0.15s, background-color 0.15s; }
+  .cat-card::before { content: ""; position: absolute; left: 0; top: 0; width: 2.75rem; height: 2.75rem; background: var(--sky); }
+  .cat-card::after { content: ""; position: absolute; right: 0; top: -2px; width: 6.5rem; height: 4px; background: var(--graphite); }
+  .cat-card:hover { border-color: var(--deep); background: #e6f4f7; }
+  .cat-card h2 { font-size: clamp(1rem, 2.4vw, 1.333rem); line-height: 1.2; }
+  .cat-card p { margin: 1rem 0 0; font-size: 0.8125rem; font-weight: 400; color: var(--ink); }
+  .cat-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: auto; padding-top: 1.25rem; font-size: 0.583rem; font-weight: 500; color: var(--deep); }
+  .cat-card .eyebrow { margin-bottom: 0.6rem; font-size: 0.75rem; font-weight: 700; color: var(--deep); }
+  .arrow { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; }
+  .arrow svg { width: 1.1rem; height: 1.1rem; transition: transform 0.15s; }
+  .cat-card:hover .arrow svg, .row:hover .arrow svg { transform: translateX(4px); }
+
+  /* Список курсов направления */
+  .list { margin-top: 3rem; border-top: 1px solid var(--graphite); position: relative; }
+  .list::before { content: ""; position: absolute; left: 0; top: -2px; width: 6.5rem; height: 4px; background: var(--graphite); }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem 2rem; align-items: center; padding: 2rem 0.25rem; border-bottom: 1px solid var(--mist); transition: background-color 0.15s; }
+  .row:hover { background: var(--wash); }
+  .row h2 { font-size: clamp(0.8rem, 1.867vw, 1rem); line-height: 1.3; }
+  .row p { margin: 0.6rem 0 0; max-width: 40rem; }
+  .row .meta { display: flex; flex-direction: column; align-items: flex-end; gap: 1rem; }
+
+  .duration { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.05rem; border-radius: 999px; background: var(--wash); border: 1px solid var(--sky); font-size: 0.583rem; font-weight: 500; color: var(--deep); white-space: nowrap; }
+  .duration svg { width: 1rem; height: 1rem; flex: none; }
+
+  /* Страница курса */
+  .about { max-width: 40rem; margin: 1.5rem 0 0 2.2rem; font-size: 0.75rem; }
+  .course-meta { margin: 1.5rem 0 0 2.2rem; }
+  .gain-wrap { position: relative; margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--graphite); }
+  .gain-wrap::before { content: ""; position: absolute; left: 0; top: -2px; width: 6.5rem; height: 4px; background: var(--graphite); }
+  .gain-title { margin: 0 0 1.75rem; font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--deep); }
+  .gain { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 4rem; }
+  .gain li { position: relative; padding-left: 2.5rem; }
+  .gain li::before {
+    content: ""; position: absolute; left: 0; top: 0.12rem; width: 1.5rem; height: 1.5rem; border-radius: 999px;
+    background: var(--sky) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f687e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 0.95rem no-repeat;
+  }
+  .gain strong { display: block; font-weight: 600; color: var(--graphite); line-height: 1.4; }
+  .gain p { margin: 0.25rem 0 0; }
+  .back { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 3.5rem; padding: 0.8rem 1.4rem; border: 2px solid var(--deep); border-radius: 999px; background: var(--deep); color: var(--paper); font-size: 0.8125rem; font-weight: 600; transition: background-color 0.15s, color 0.15s; }
+  .back:hover { background: var(--paper); border-color: var(--deep); color: var(--deep); }
+  .back svg { width: 1rem; height: 1rem; }
+
+  .foot { margin-top: 4rem; height: 1px; background: var(--mist); }
+  .foot-text { margin: 0; padding-top: 1.25rem; font-size: 0.542rem; letter-spacing: 0.04em; }
+
+  /* Первая страница: без логотипа, заголовок выше */
+  .wrap[data-page="catalog"] { max-width: 72rem; }
+  .wrap[data-page="catalog"] header { display: none; }
+  .wrap[data-page="catalog"] .head { padding-top: 2.5rem; }
+  .wrap[data-page="catalog"] .cat-card::before { background: var(--teal); }
+  .cat-foot { font-size: 0.8125rem; }
+  .cat-foot .arrow svg { width: 1.3rem; height: 1.3rem; }
+  .wrap[data-page="catalog"] .corner { padding: 0; }
+  .wrap[data-page="catalog"] .corner::before { display: none; }
+  .wrap[data-page="catalog"] h1 { color: var(--deep); }
+  .wrap[data-page="catalog"] .lead { margin: 0.6rem 0 0; font-size: 0.875rem; font-weight: 400; color: var(--ink); }
+
+  /* Страницы направлений (Hard Skills, Soft Skills): одинаковые правки для обеих */
+  .wrap[data-page$="-skills"] header { display: none; }
+  .wrap[data-page$="-skills"] .crumbs { padding-top: 2rem; font-size: 0.875rem; }
+  .wrap[data-page$="-skills"] .head { padding-top: 1.25rem; }
+  .wrap[data-page$="-skills"] .corner { padding: 0; }
+  .wrap[data-page$="-skills"] .corner::before { display: none; }
+  .wrap[data-page$="-skills"] h1 { color: var(--deep); }
+  .wrap[data-page$="-skills"] .lead { display: none; }
+  .wrap[data-page$="-skills"] .list { margin-top: 2rem; }
+  .wrap[data-page$="-skills"] .row h2 { font-size: clamp(1rem, 2vw, 1.125rem); }
+  .wrap[data-page$="-skills"] .row p { font-size: 0.875rem; font-weight: 400; color: var(--ink); }
+
+  /* Страницы курсов: одинаковые правки для всех четырёх */
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) header { display: none; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .crumbs { padding-top: 2rem; font-size: 0.875rem; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .head { padding-top: 1.25rem; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .corner { padding: 0; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .corner::before { display: none; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) h1 { color: var(--deep); font-size: clamp(1.5rem, 4.2vw, 2.5rem); }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .about, .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .course-meta { display: none; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .gain-wrap { margin-top: 2rem; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .gain-title { font-size: 0.9375rem; font-weight: 700; }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .gain strong { font-size: 0.9375rem; color: var(--ink); }
+  .wrap:is([data-page="ai-prompts"], [data-page="bitrix24"], [data-page="new-habits"], [data-page="smart-goals"]) .gain p { font-size: 0.875rem; font-weight: 400; color: var(--ink); }
+
+  /* Список курсов направления: длительность и «Открыть» крупнее */
+  .row .duration { font-size: 0.8125rem; padding: 0.55rem 1.15rem; }
+  .row .duration svg { width: 1.15rem; height: 1.15rem; }
+  .row .arrow { font-size: 0.875rem; }
+  .row .arrow svg { width: 1.3rem; height: 1.3rem; }
+
+  /* Страница инструкции */
+  .doc { max-width: 46rem; }
+  .doc-sec { position: relative; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--graphite); }
+  .doc-sec::before { content: ""; position: absolute; left: 0; top: -2px; width: 6.5rem; height: 4px; background: var(--graphite); }
+  .doc h2 { font-size: 1rem; line-height: 1.3; }
+  .doc p { margin: 0.75rem 0 0; }
+  .steps { counter-reset: s; list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: 1.1rem; }
+  .steps li { position: relative; padding-left: 2.5rem; counter-increment: s; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0.05rem; width: 1.5rem; height: 1.5rem; border-radius: 999px; background: var(--sky); color: var(--deep); font-weight: 600; font-size: 0.583rem; display: flex; align-items: center; justify-content: center; }
+  .steps strong { font-weight: 600; }
+  .bul { margin: 1rem 0 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+  .tpl { margin: 1.25rem 0 0; padding: 1.25rem 1.5rem; background: var(--wash); border: 1px solid var(--sky); font: 400 0.6rem/1.9 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-x: auto; color: var(--graphite); }
+  .copy { margin-top: 0.9rem; font: 500 0.583rem/1 var(--font-body); padding: 0.7rem 1.2rem; border-radius: 999px; background: var(--paper); color: var(--graphite); border: 1px solid var(--graphite); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+  .copy:hover { border-color: var(--deep); color: var(--deep); }
+  .copy:focus-visible { outline: 3px solid var(--aqua); outline-offset: 3px; }
+  .scroll { overflow-x: auto; margin-top: 1.25rem; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: inherit; line-height: inherit; }
+  .tbl th, .tbl td { text-align: left; padding: 0.7rem 0.75rem 0.7rem 0; border-bottom: 1px solid var(--mist); vertical-align: top; }
+  .tbl th { font-size: 0.5rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--deep); border-bottom-color: var(--graphite); }
+  .tbl code { font: 500 0.6rem ui-monospace, Menlo, Consolas, monospace; color: var(--deep); white-space: nowrap; }
+
+  @media (max-width: 760px) {
+    .logo { height: 3rem; }
+    .head { padding-top: 2.5rem; }
+    .corner { padding: 1.9rem 0 0 1.5rem; }
+    .corner::before { width: 3.4rem; height: 3.4rem; }
+    .lead, .about, .course-meta { margin-left: 1.5rem; }
+    .cats { grid-template-columns: minmax(0, 1fr); margin-top: 2.5rem; }
+    .cat-card { padding: 3.25rem 1.25rem 1.25rem; }
+    .row { grid-template-columns: minmax(0, 1fr); padding: 1.75rem 0; }
+    .row .meta { flex-direction: row; align-items: center; justify-content: space-between; }
+    .gain { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap" data-page="catalog">
+  <header>
+    <div class="top"><a href="#catalog" data-go="catalog" aria-label="H2O cleaning service, к каталогу"><svg class="logo" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 982.22 779.43">
+<defs>
+<style>
+.lg1 {
+fill: #19ac9f;
+}
+.lg2 {
+fill: #20b2a2;
+}
+.lg3 {
+fill: #111210;
+}
+</style>
+</defs>
+<g>
+<path class="lg2" d="M802.8,3.75c-1.8-2.4-4.8-3.75-8.1-3.75h-.15c-3.15,0-6.15,1.35-7.95,3.75-1.8,2.25-179.42,233.88-179.42,335.44s84.16,187.52,187.52,187.52,187.52-84.01,187.52-187.52S804.6,6,802.8,3.75ZM794.7,506.15c-91.96,0-166.82-74.86-166.82-166.97,0-79.81,126.01-256.68,164.57-309.03l2.25-3,2.25,3c38.7,52.36,164.72,229.22,164.72,309.03,0,92.11-74.86,166.97-166.97,166.97Z"/>
+<g>
+<path class="lg1" d="M931.51,349.39c-17.4,60.46-63.61,108.01-123.61,127.06-.75.3-1.8.45-3,.45-4.35,0-8.4-3-9.9-7.2-.75-2.55-.45-5.4.75-7.8,1.35-2.55,3.45-4.35,6-5.1,53.26-17.1,94.36-59.41,109.81-113.11.75-2.7,2.55-4.95,4.95-6.3,1.5-.9,3.15-1.35,4.95-1.35.9,0,1.8.15,2.85.45,5.4,1.65,8.7,7.35,7.2,12.9Z"/>
+<path class="lg2" d="M931.51,349.39c-17.4,60.46-63.61,108.01-123.61,127.06-.75.3-1.8.45-3,.45-4.35,0-8.4-3-9.9-7.2-.75-2.55-.45-5.4.75-7.8,1.35-2.55,3.45-4.35,6-5.1,53.26-17.1,94.36-59.41,109.81-113.11.75-2.7,2.55-4.95,4.95-6.3,1.5-.9,3.15-1.35,4.95-1.35.9,0,1.8.15,2.85.45,5.4,1.65,8.7,7.35,7.2,12.9Z"/>
+</g>
+<polygon class="lg3" points="383.79 273.41 384.88 502.85 411.25 502.7 408.97 22.23 382.6 22.34 383.66 247.07 60.24 248.61 59.17 23.88 32.8 24 35.09 504.49 61.45 504.37 60.37 274.95 383.79 273.41"/>
+<path class="lg3" d="M482.08,451.25c4.94-5,10.78-9.04,17.35-12,6.46-2.89,12.91-4.38,19.15-4.42h.25c8.99,0,15.97,1.99,20.77,5.93,4.53,3.72,6.76,8.85,6.78,15.72.04,6.31-3.6,17.83-21.09,36.84l-57.64,62.16.04,9.68-.07.07.1,6.62,109.98-.53-.08-19.6-80.2.38,42.22-45.74c8.46-8.56,15.09-17.14,19.72-25.52,4.91-8.89,7.37-17.24,7.33-24.82-.07-12.67-4.65-22.85-13.66-30.25-8.65-7.08-19.95-11.15-34.55-10.56-9.02.04-18.05,2.04-26.82,5.89-8.72,3.85-16.46,9.16-23.03,15.78l-4.09,4.13,12.42,15.38,5.11-5.16Z"/>
+</g>
+<g>
+<path class="lg3" d="M58.68,718.69c-.32-.32-.8-.32-1.27.16,0,0-9.22,10.02-23.37,10.02-16.54,0-31.33-12.88-31.33-30.85s14.31-30.21,31.33-30.21c13.99,0,22.1,7.64,22.1,7.64.48.48,1.11.64,1.59.16l.64-.64c.32-.32.48-.8,0-1.27,0,0-9.22-8.74-24.33-8.74-18.61,0-34.03,13.83-34.03,33.07s15.9,33.72,34.03,33.72c15.74,0,25.6-11.29,25.6-11.29.32-.32.16-.64-.16-.96l-.8-.8Z"/>
+<path class="lg3" d="M81.74,618.83h.64c.62,0,1.11.5,1.11,1.11v109.08c0,.62-.5,1.11-1.11,1.11h-.63c-.62,0-1.11-.5-1.11-1.11v-109.08c0-.61.5-1.11,1.11-1.11Z"/>
+<path class="lg3" d="M135.97,664.95c-19.4,0-31.32,14.63-31.32,33.07s11.92,33.72,31.32,33.72c10.66,0,19.24-4.45,23.22-7.48.32-.32.64-.64.32-1.11l-.64-.95c-.16-.32-.63-.64-1.27-.16-3.5,2.86-11.61,6.83-21.63,6.83-17.33,0-27.83-12.88-28.3-29.42h55.65c.32,0,.79-.32.95-.64.48-.8.64-3.66.64-4.77,0-17.18-12.08-29.1-28.94-29.1ZM161.89,696.75h-54.22c.63-16.22,10.97-28.95,28.3-28.95,14.95,0,26.08,10.65,26.08,26.24,0,.64,0,1.75-.16,2.71Z"/>
+<path class="lg3" d="M208.82,664.95c-13.04,0-20.99,5.25-20.99,5.25-.32.16-.8.48-.32,1.27l.48.79c.32.48.64.8,1.43.32,0,0,7.31-4.77,19.4-4.77,13.51,0,17.65,5.88,17.65,18.45v5.88c-3.5-1.27-10.97-3.66-18.76-3.66-16.85,0-27.99,9.22-27.99,21.79,0,13.35,9.7,21.47,22.1,21.47,10.5,0,19.72-5.57,24.65-9.86v7.15c0,.64.47,1.11,1.11,1.11h.64c.64,0,1.11-.48,1.11-1.11v-42.77c0-14.48-4.93-21.31-20.51-21.31ZM226.47,717.89c-3.18,3.98-13.04,10.97-24.65,10.97-10.81,0-19.24-6.83-19.24-18.6,0-10.97,9.86-18.92,25.12-18.92,8.43,0,16.54,3.02,18.76,3.66v22.89Z"/>
+<path class="lg3" d="M282.13,664.95c-12.4,0-20.83,7.15-24.8,11.45v-8.75c0-.64-.48-1.11-1.11-1.11h-.64c-.63,0-1.11.47-1.11,1.11v61.38c0,.64.48,1.11,1.11,1.11h.64c.64,0,1.11-.48,1.11-1.11v-48.18c1.27-1.75,10.65-13.04,24.8-13.04,15.27,0,23.54,9.38,23.54,26.72v34.5c0,.64.48,1.11,1.11,1.11h.64c.64,0,1.11-.48,1.11-1.11v-34.5c0-19.24-9.23-29.58-26.4-29.58Z"/>
+<path class="lg3" d="M334.46,666.54c-.64,0-1.11.47-1.11,1.11v61.38c0,.64.48,1.11,1.11,1.11h.63c.64,0,1.11-.48,1.11-1.11v-61.38c0-.64-.48-1.11-1.11-1.11h-.63Z"/>
+<path class="lg3" d="M389.64,664.95c-12.4,0-20.83,7.15-24.8,11.45v-8.75c0-.64-.48-1.11-1.11-1.11h-.63c-.64,0-1.11.47-1.11,1.11v61.38c0,.64.48,1.11,1.11,1.11h.63c.64,0,1.11-.48,1.11-1.11v-48.18c1.27-1.75,10.65-13.04,24.8-13.04,15.27,0,23.54,9.38,23.54,26.72v34.5c0,.64.48,1.11,1.11,1.11h.64c.64,0,1.11-.48,1.11-1.11v-34.5c0-19.24-9.23-29.58-26.4-29.58Z"/>
+<path class="lg3" d="M476.96,733h-29.26c-5.25,0-10.5-3.97-10.5-10.81,0-8.43,6.84-12.25,9.23-13.36,4.13,4.45,10.65,7.48,19.72,7.48,15.9,0,26.08-11.93,26.08-25.76s-6.68-19.56-12.72-22.74h14.47c.64,0,1.11-.48,1.11-1.11v-.63c0-.64-.48-1.11-1.11-1.11h-27.83c-16.22,0-26.4,11.61-26.4,25.6,0,5.88,1.43,11.6,4.77,16.06-3.5,1.74-10.18,6.36-10.18,15.58,0,8.27,6.68,13.35,13.04,13.51-5.09,3.18-10.81,9.38-10.81,18.6,0,10.97,9.7,25.12,31.48,25.12,19.56,0,32.12-12.4,32.12-26.08,0-14.47-9.38-20.35-23.22-20.35ZM442.61,690.55c0-12.41,8.91-22.74,23.53-22.74h4.77s18.45,1.27,18.45,22.74c0,12.24-8.91,22.89-23.22,22.89-16.85,0-23.53-10.97-23.53-22.89ZM468.05,776.57c-20.04,0-28.62-12.57-28.62-22.26,0-12.4,11.92-18.28,14.95-18.6h22.58c12.24,0,20.35,5.09,20.35,17.65s-11.13,23.22-29.26,23.22Z"/>
+<path class="lg3" d="M565.55,695.8c-12.24-3.5-18.6-7-18.6-14.47,0-5.88,5.41-13.52,18.44-13.52,7.64,0,13.52,2.71,16.54,4.61.8.48,1.11.16,1.43-.32l.48-.79c.31-.48.15-.96-.32-1.27-3.18-2.07-9.55-5.09-18.13-5.09-14.95,0-21.47,9.22-21.47,16.38,0,8.9,6.84,13.2,20.99,17.17,11.93,3.34,21.47,6.68,21.47,15.74,0,8.27-8.58,14.63-20.04,14.63-9.86,0-16.06-3.97-19.24-6.51-.64-.48-1.11-.48-1.43,0l-.8,1.11c-.16.48,0,.8.48,1.11,3.5,2.71,10.02,7.16,20.99,7.16,12.88,0,23.21-7.64,23.21-17.49,0-11.61-11.28-14.79-24.01-18.44Z"/>
+<path class="lg3" d="M635.84,664.95c-19.4,0-31.33,14.63-31.33,33.07s11.93,33.72,31.33,33.72c10.65,0,19.24-4.45,23.22-7.48.32-.32.64-.64.32-1.11l-.64-.95c-.16-.32-.64-.64-1.27-.16-3.5,2.86-11.61,6.83-21.63,6.83-17.33,0-27.82-12.88-28.3-29.42h55.65c.32,0,.8-.32.96-.64.48-.8.64-3.66.64-4.77,0-17.18-12.09-29.1-28.94-29.1ZM661.76,696.75h-54.22c.64-16.22,10.97-28.95,28.3-28.95,14.95,0,26.08,10.65,26.08,26.24,0,.64,0,1.75-.16,2.71Z"/>
+<path class="lg3" d="M708.52,664.95c-10.49,0-17.49,6.67-20.67,11.13v-8.43c0-.64-.48-1.11-1.11-1.11h-.64c-.64,0-1.11.47-1.11,1.11v61.38c0,.64.48,1.11,1.11,1.11h.64c.64,0,1.11-.48,1.11-1.11v-48.18c1.11-1.91,7.95-13.04,20.67-13.04,6.52,0,10.18,2.55,10.18,2.55.64.32,1.27,0,1.43-.32l.47-.8c.32-.48.16-1.11-.31-1.43,0,0-3.98-2.86-11.77-2.86Z"/>
+<path class="lg3" d="M783.1,665.59c-.64-.32-.95.16-1.11.48l-26.72,60.9-26.72-60.9c-.16-.32-.48-.8-1.11-.48l-1.11.48c-.47.16-.47.63-.16,1.27l28.15,64.4c.48.95,1.43.95,1.91,0l28.14-64.4c.32-.64.32-1.11-.16-1.27l-1.12-.48Z"/>
+<path class="lg3" d="M800.92,666.54c-.64,0-1.11.47-1.11,1.11v61.38c0,.64.48,1.11,1.11,1.11h.64c.64,0,1.11-.48,1.11-1.11v-61.38c0-.64-.48-1.11-1.11-1.11h-.64Z"/>
+<path class="lg3" d="M882.19,718.69c-.32-.32-.8-.32-1.27.16,0,0-9.22,10.02-23.37,10.02-16.54,0-31.33-12.88-31.33-30.85s14.31-30.21,31.33-30.21c13.99,0,22.1,7.64,22.1,7.64.48.48,1.11.64,1.59.16l.64-.64c.32-.32.48-.8,0-1.27,0,0-9.22-8.74-24.33-8.74-18.61,0-34.03,13.83-34.03,33.07s15.9,33.72,34.03,33.72c15.74,0,25.6-11.29,25.6-11.29.32-.32.16-.64-.16-.96l-.8-.8Z"/>
+<path class="lg3" d="M930.86,664.95c-19.4,0-31.33,14.63-31.33,33.07s11.93,33.72,31.33,33.72c10.66,0,19.24-4.45,23.22-7.48.32-.32.64-.64.32-1.11l-.64-.95c-.16-.32-.64-.64-1.27-.16-3.5,2.86-11.61,6.83-21.63,6.83-17.33,0-27.82-12.88-28.3-29.42h55.65c.32,0,.8-.32.96-.64.48-.8.64-3.66.64-4.77,0-17.18-12.09-29.1-28.95-29.1ZM956.78,696.75h-54.22c.64-16.22,10.97-28.95,28.3-28.95,14.95,0,26.08,10.65,26.08,26.24,0,.64,0,1.75-.16,2.71Z"/>
+</g>
+</svg></a></div>
+    <div class="rule" role="presentation"></div>
+  </header>
+
+  <main>
+    <!-- Экран 1: направления -->
+    <section class="view" data-route="catalog">
+      <div class="head">
+        <div class="corner"><h1>Каталог курсов</h1></div>
+        <p class="lead">Выбирайте обучение под свои задачи и интересы. Откройте категорию, чтобы познакомиться с курсами и найти то, что полезно вам сейчас.</p>
+      </div>
+      <div class="cats">
+        <a class="cat-card" href="#hard-skills" data-go="hard-skills">
+          <span class="eyebrow">Hard Skills</span>
+          <h2>Рабочие знания и навыки</h2>
+          <p>Осваивайте полезные инструменты, технологии и практические приёмы, которые пригодятся для решения рабочих задач.</p>
+          <div class="cat-foot"><span>2 курса</span><span class="arrow">Смотреть курсы<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span></div>
+        </a>
+        <a class="cat-card" href="#soft-skills" data-go="soft-skills">
+          <span class="eyebrow">Soft Skills</span>
+          <h2>Личные и деловые навыки</h2>
+          <p>Развивайте навыки, которые помогут организовывать свою работу, эффективно общаться с коллегами и достигать целей.</p>
+          <div class="cat-foot"><span>2 курса</span><span class="arrow">Смотреть курсы<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Экран 2: курсы направления Hard Skills -->
+    <section class="view" data-route="hard-skills" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><span class="here">Hard Skills</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Рабочие знания и навыки</h1></div>
+        <p class="lead">Осваивайте полезные инструменты, технологии и практические приёмы, которые пригодятся для решения рабочих задач.</p>
+      </div>
+      <div class="list">
+        <a class="row" href="#ai-prompts" data-go="ai-prompts">
+          <div>
+            <h2>Как составить идеальный ИИ-промпт и получить нужный результат</h2>
+            <p>Курс посвящён работе с промптами — от выбора подходящего типа запроса до улучшения полученного ответа.</p>
+          </div>
+          <div class="meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>около 30 минут</span><span class="arrow">Открыть<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span></div>
+        </a>
+        <a class="row" href="#bitrix24" data-go="bitrix24">
+          <div>
+            <h2>Битрикс24. Как навести порядок в рабочих задачах</h2>
+            <p>Короткие уроки — от первой задачи до автоматизации процессов. Всё, что нужно, чтобы команда не теряла задачи и успевала в срок.</p>
+          </div>
+          <div class="meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 час 10 минут</span><span class="arrow">Открыть<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span></div>
+        </a>
+      </div>
+          <a class="back" href="#catalog" data-go="catalog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>Все курсы</a>
+    </section>
+
+    <!-- Экран 2: курсы направления Soft Skills -->
+    <section class="view" data-route="soft-skills" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><span class="here">Soft Skills</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Личные и деловые навыки</h1></div>
+        <p class="lead">Развивайте навыки, которые помогут организовывать свою работу, эффективно общаться с коллегами и достигать целей.</p>
+      </div>
+      <div class="list">
+        <a class="row" href="#new-habits" data-go="new-habits">
+          <div>
+            <h2>Новые привычки</h2>
+            <p>Как сделать полезные действия привычными и не бросить начатое на полпути? Курс знакомит с методами формирования привычек и способами поддерживать мотивацию на пути к цели.</p>
+          </div>
+          <div class="meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>около 40 минут</span><span class="arrow">Открыть<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span></div>
+        </a>
+        <a class="row" href="#smart-goals" data-go="smart-goals">
+          <div>
+            <h2>Постановка целей по SMART(+ER). Как ставить достижимые цели</h2>
+            <p>Курс о том, как превратить общее намерение в конкретную цель с понятным результатом и сроком. Вы узнаете, как ставить цели по SMART, оценивать их и пересматривать при необходимости.</p>
+          </div>
+          <div class="meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>около 30 минут</span><span class="arrow">Открыть<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></span></div>
+        </a>
+      </div>
+          <a class="back" href="#catalog" data-go="catalog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>Все курсы</a>
+    </section>
+
+    <!-- Экран 3: курсы -->
+    <article class="view" data-route="ai-prompts" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><a href="#hard-skills" data-go="hard-skills">Hard Skills</a><span class="sep">/</span><span class="here">ИИ-промпт</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Как составить идеальный ИИ-промпт и получить нужный результат</h1></div>
+        <p class="about">Курс посвящён работе с промптами — от выбора подходящего типа запроса до улучшения полученного ответа.</p>
+        <div class="course-meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>около 30 минут</span></div>
+      </div>
+      <div class="gain-wrap">
+        <p class="gain-title">Что изменится в работе после курса</p>
+        <ul class="gain">
+          <li><strong>Запросы к ИИ станут точнее</strong><p>Вы поймёте, как ИИ обрабатывает промпт и почему формулировка запроса влияет на результат</p></li>
+          <li><strong>Для каждой задачи — подходящий промпт</strong><p>Научитесь различать типы промптов и выбирать нужный в зависимости от задачи</p></li>
+          <li><strong>Промпты выстроены по фреймворку CARE</strong><p>Сможете последовательно формулировать запрос, добавляя необходимую информацию и требования к результату</p></li>
+          <li><strong>Сложные задачи решаются эффективнее</strong><p>Освоите продвинутые техники: примеры, ограничения, уточнение формата и критериев качества ответа</p></li>
+          <li><strong>Результат улучшается шаг за шагом</strong><p>Научитесь анализировать ответы ИИ, уточнять запрос и последовательно доводить результат до нужного качества</p></li>
+        </ul>
+      </div>
+      <a class="back" href="#hard-skills" data-go="hard-skills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>Все курсы категории</a>
+    </article>
+
+    <article class="view" data-route="bitrix24" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><a href="#hard-skills" data-go="hard-skills">Hard Skills</a><span class="sep">/</span><span class="here">Битрикс24</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Битрикс24. Как навести порядок в рабочих задачах</h1></div>
+        <p class="about">Короткие уроки — от первой задачи до автоматизации процессов. Всё, что нужно, чтобы команда не теряла задачи и успевала в срок.</p>
+        <div class="course-meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 час 10 минут</span></div>
+      </div>
+      <div class="gain-wrap">
+        <p class="gain-title">Что изменится в работе после курса</p>
+        <ul class="gain">
+          <li><strong>Все задачи — в одной системе</strong><p>Поручения, файлы, обсуждения и история — в единой карточке задачи</p></li>
+          <li><strong>Задачи выполняются в срок</strong><p>Научитесь ставить задачи по методике SMART с дедлайнами, чек-листами и контролем результата</p></li>
+          <li><strong>Контроль без микроменеджмента</strong><p>Руководитель видит загрузку команды, риски и статусы без бесконечных «ну как там?»</p></li>
+          <li><strong>Команда работает слаженно</strong><p>Роли распределены, соисполнители знают свою часть, а все обсуждения ведутся прямо в задаче</p></li>
+          <li><strong>Рутина автоматизирована</strong><p>Регулярные задачи создаются сами, роботы уведомляют нужных людей — без ручной работы.</p></li>
+          <li><strong>AI помогает на каждом шаге</strong><p>BitrixGPT распознаёт поручения из голосовых сообщений, создаёт чек-листы и оформляет задачи.</p></li>
+        </ul>
+      </div>
+      <a class="back" href="#hard-skills" data-go="hard-skills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>Все курсы категории</a>
+    </article>
+
+    <article class="view" data-route="new-habits" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><a href="#soft-skills" data-go="soft-skills">Soft Skills</a><span class="sep">/</span><span class="here">Новые привычки</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Новые привычки</h1></div>
+        <p class="about">Как сделать полезные действия привычными и не бросить начатое на полпути? Курс знакомит с методами формирования привычек и способами поддерживать мотивацию на пути к цели.</p>
+        <div class="course-meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>около 40 минут</span></div>
+      </div>
+      <div class="gain-wrap">
+        <p class="gain-title">Что изменится в работе после курса</p>
+        <ul class="gain">
+          <li><strong>Новые привычки — с учётом ваших возможностей</strong><p>Узнаете, как оценивать возможности для освоения привычки и выбирать подходящие условия для её формирования</p></li>
+          <li><strong>Полезные действия становятся регулярными</strong><p>Разберётесь, как работают сигнал к действию, повторение и награда и какую роль они играют в закреплении привычки</p></li>
+          <li><strong>Мотивацию проще поддерживать</strong><p>Познакомитесь со способами сохранять последовательность действий и продолжать начатое на пути к цели</p></li>
+          <li><strong>Окружение помогает изменениям</strong><p>Узнаете, как менять привычные условия, чтобы они способствовали формированию нового поведения</p></li>
+          <li><strong>Есть идеи для повышения продуктивности</strong><p>Найдёте примеры полезных привычек, которые можно применять в работе</p></li>
+        </ul>
+      </div>
+      <a class="back" href="#soft-skills" data-go="soft-skills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>Все курсы категории</a>
+    </article>
+
+    <article class="view" data-route="smart-goals" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><a href="#soft-skills" data-go="soft-skills">Soft Skills</a><span class="sep">/</span><span class="here">Цели по SMART</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Постановка целей по SMART(+ER). Как ставить достижимые цели</h1></div>
+        <p class="about">Курс о том, как превратить общее намерение в конкретную цель с понятным результатом и сроком. Вы узнаете, как ставить цели по SMART, оценивать их и пересматривать при необходимости.</p>
+        <div class="course-meta"><span class="duration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>около 30 минут</span></div>
+      </div>
+      <div class="gain-wrap">
+        <p class="gain-title">Что изменится в работе после курса</p>
+        <ul class="gain">
+          <li><strong>Цели сформулированы чётко</strong><p>Научитесь ставить цели себе и команде по пяти критериям SMART: конкретность, измеримость, достижимость, уместность и ограниченность во времени</p></li>
+          <li><strong>Ожидаемый результат понятен</strong><p>Сможете определять, что именно должно быть достигнуто, к какому сроку и как оценить результат</p></li>
+          <li><strong>Существующие цели проверены по SMART</strong><p>Научитесь находить неточности в формулировках и корректировать цели в соответствии с критериями методики</p></li>
+          <li><strong>Цели оцениваются и пересматриваются</strong><p>Разберётесь, как дополнительные критерии ER помогают оценивать продвижение к цели и при необходимости вносить изменения</p></li>
+        </ul>
+      </div>
+      <a class="back" href="#soft-skills" data-go="soft-skills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>Все курсы категории</a>
+    </article>
+    <!-- Страница инструкции (не показана в каталоге, открывается по адресу #instruction) -->
+    <article class="view" data-route="instruction" hidden>
+      <nav class="crumbs" aria-label="Навигация"><a href="#catalog" data-go="catalog">Каталог</a><span class="sep">/</span><span class="here">Инструкция</span></nav>
+      <div class="head">
+        <div class="corner"><h1>Как обновлять каталог</h1></div>
+        <p class="about">Инструкция для администратора каталога: как добавить курс, изменить или убрать его и дать в посте прямую ссылку на нужный курс.</p>
+      </div>
+      <div class="doc">
+        <section class="doc-sec">
+          <h2>Как добавить курс</h2>
+          <ol class="steps">
+            <li><strong>Подготовьте данные курса.</strong> Нужны название, направление, длительность, описание и список того, что изменится в работе после курса. Удобный шаблон ниже.</li>
+            <li><strong>Отправьте их Claude.</strong> Напишите в проект «Каталог курсов» и приложите данные текстом или файлом Word, как вы делали раньше.</li>
+            <li><strong>Claude добавит курс.</strong> Он появится в списке своего направления и получит собственную страницу с описанием.</li>
+            <li><strong>Проверьте результат.</strong> Откройте каталог по прежней ссылке. Адрес не меняется, пост обновлять не нужно.</li>
+          </ol>
+          <pre class="tpl" id="tpl">Название курса:
+Направление: Hard Skills или Soft Skills
+Длительность: например, около 30 минут
+Описание: 1–2 предложения о курсе
+Что изменится в работе после курса:
+— Заголовок пункта: пояснение
+— Заголовок пункта: пояснение
+— Заголовок пункта: пояснение</pre>
+          <button class="copy" type="button" id="copy-tpl">Скопировать шаблон</button>
+        </section>
+
+        <section class="doc-sec">
+          <h2>Другие изменения</h2>
+          <p>Всё это тоже делается сообщением Claude в том же проекте:</p>
+          <ul class="bul">
+            <li>исправить текст, название или длительность курса;</li>
+            <li>убрать курс из каталога;</li>
+            <li>поменять порядок курсов в направлении;</li>
+            <li>добавить новое направление, на главной появится ещё одна карточка;</li>
+            <li>изменить размер шрифта или оформление.</li>
+          </ul>
+        </section>
+
+        <section class="doc-sec">
+          <h2>Прямые ссылки для поста</h2>
+          <p>Чтобы ссылка из поста открывала сразу нужное направление или курс, добавьте к ссылке на каталог окончание из таблицы. Например, после адреса каталога допишите <code>#bitrix24</code>.</p>
+          <div class="scroll">
+            <table class="tbl">
+              <thead><tr><th>Куда ведёт</th><th>Окончание</th></tr></thead>
+              <tbody>
+                <tr><td>Главная каталога</td><td><code>без окончания</code></td></tr>
+                <tr><td>Hard Skills</td><td><code>#hard-skills</code></td></tr>
+                <tr><td>Soft Skills</td><td><code>#soft-skills</code></td></tr>
+                <tr><td>ИИ-промпт</td><td><code>#ai-prompts</code></td></tr>
+                <tr><td>Битрикс24</td><td><code>#bitrix24</code></td></tr>
+                <tr><td>Новые привычки</td><td><code>#new-habits</code></td></tr>
+                <tr><td>Цели по SMART</td><td><code>#smart-goals</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Для нового курса Claude сообщит окончание, когда добавит его.</p>
+        </section>
+
+        <section class="doc-sec">
+          <h2>Доступ к каталогу</h2>
+          <p>Пока вы не открыли доступ, каталог видите только вы. Чтобы сотрудники могли его открыть, включите доступ в меню «Поделиться» на странице каталога.</p>
+          <p>Эта страница не показана в каталоге. Открыть её можно, добавив к ссылке на каталог окончание <code>#instruction</code>.</p>
+        </section>
+      </div>
+      <a class="back" href="#catalog" data-go="catalog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>К каталогу</a>
+    </article>
+
+  </main>
+
+  <footer>
+    <div class="foot"></div>
+    <p class="foot-text">H2O cleaning service · Каталог курсов</p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var views = Array.prototype.slice.call(document.querySelectorAll('.view'));
+    var current = null;
+    function find(r) { return views.filter(function (v) { return v.dataset.route === r; })[0]; }
+    function show(r, moveFocus) {
+      var v = find(r) || find('catalog');
+      if (current === v.dataset.route) return;
+      current = v.dataset.route;
+      var w = document.querySelector('.wrap'); if (w) w.setAttribute('data-page', current);
+      views.forEach(function (x) { x.hidden = x !== v; });
+      window.scrollTo(0, 0);
+      if (moveFocus) {
+        var h = v.querySelector('h1');
+        if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+      }
+    }
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest ? e.target.closest('a[data-go]') : null;
+      if (!a) return;
+      e.preventDefault();
+      var r = a.getAttribute('data-go');
+      show(r, true);
+      try { location.hash = r; } catch (err) {}
+    });
+    window.addEventListener('hashchange', function () { show((location.hash || '').slice(1) || 'catalog', true); });
+
+    var cb = document.getElementById('copy-tpl');
+    if (cb) cb.addEventListener('click', function () {
+      var el = document.getElementById('tpl');
+      function sel() { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+      function done(ok) { cb.textContent = ok ? 'Скопировано' : 'Выделено, нажмите Ctrl+C'; setTimeout(function () { cb.textContent = 'Скопировать шаблон'; }, 2000); }
+      try { navigator.clipboard.writeText(el.textContent).then(function () { done(true); }, function () { sel(); done(false); }); }
+      catch (e) { sel(); done(false); }
+    });
+    show((location.hash || '').slice(1) || 'catalog', false);
+  })();
+</script>
+
+</body>
+</html>
